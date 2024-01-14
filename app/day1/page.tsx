@@ -1,23 +1,45 @@
 "use client";
 import Hero from "@/components/Hero";
-import React, { useRef } from "react";
-import { Link as ScrollLink } from "react-scroll";
+import React, { useRef, useState, useEffect } from "react";
+import BackArrow from "@/components/BackArrow";
+import TopArrow from "@/components/TopArrow";
+import ContentContainer from "@/components/ContentContainer";
 
 const Day1 = () => {
-  const targetRef = useRef(null);
+  const targetRef = useRef<HTMLDivElement | null>(null);
+  const [showArrowUp, setShowArrowUp] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      const secondDivOffset = targetRef.current?.offsetTop || 0;
+
+      // Adjust the threshold value as needed
+      const threshold = 100;
+
+      setShowArrowUp(scrollPosition > secondDivOffset - threshold);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   return (
-    <div className="px-8">
+    <div className="bg-zinc-900">
+      <BackArrow />
       <Hero
         title="Day 1"
         learningOutcome="Lorem ipsum dolor sit amet"
         scrollTo="flexbox"
       />
-      <div className="min-h-screen bg-base-200" ref={targetRef} id="flexbox">
-        <div className="navbar">
-          <a className="text-xl">CSS Flexbox</a>
-        </div>
+      <div ref={targetRef} id="flexbox">
+        <ContentContainer title="CSS Flexbox" />
       </div>
+      <ContentContainer title="CSS Grid" />
+      {showArrowUp && <TopArrow />}
     </div>
   );
 };
